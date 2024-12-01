@@ -1,4 +1,5 @@
 import requests
+import json
 
 def emotion_detector(text_to_analyze):
     # Endpoint URL and headers
@@ -15,6 +16,9 @@ def emotion_detector(text_to_analyze):
     try:
         response = requests.post(url, json=input_json, headers=headers)
         response.raise_for_status()  # Raise exception for HTTP errors
-        return response.text
+        formatted_response = json.loads(response.text)
+        emotions = formatted_response["emotionPredictions"][0]["emotion"]
+        emotions["dominant_emotion"] = max(emotions, key=emotions.get)
+        return emotions
     except requests.exceptions.RequestException as e:
         return {"error": str(e)}
